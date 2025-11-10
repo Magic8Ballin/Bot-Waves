@@ -1,0 +1,9 @@
+C:\Users\Magic8Ball\source\repos\Bot-Waves\bin\Release\addons\counterstrikesharp\plugins\Bot-Quota-GoldKingZ\lang\en.json
+C:\Users\Magic8Ball\source\repos\Bot-Waves\bin\Release\addons\counterstrikesharp\plugins\Bot-Quota-GoldKingZ\Bot-Quota-GoldKingZ.deps.json
+C:\Users\Magic8Ball\source\repos\Bot-Waves\bin\Release\addons\counterstrikesharp\plugins\Bot-Quota-GoldKingZ\Bot-Quota-GoldKingZ.dll
+C:\Users\Magic8Ball\source\repos\Bot-Waves\obj\Debug\Bot-Quota-GoldKingZ.csproj.AssemblyReference.cache
+C:\Users\Magic8Ball\source\repos\Bot-Waves\obj\Debug\Bot-Quota-GoldKingZ.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Magic8Ball\source\repos\Bot-Waves\obj\Debug\Bot-Quota-GoldKingZ.csproj.CoreCompileInputs.cache
+C:\Users\Magic8Ball\source\repos\Bot-Waves\obj\Debug\Bot-Quota-GoldKingZ.dll
+C:\Users\Magic8Ball\source\repos\Bot-Waves\obj\Debug\refint\Bot-Quota-GoldKingZ.dll
+C:\Users\Magic8Ball\source\repos\Bot-Waves\obj\Debug\ref\Bot-Quota-GoldKingZ.dll

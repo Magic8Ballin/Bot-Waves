@@ -1,4 +1,25 @@
 {
     "PrintChatToAll.LessPlayers": "{green}Gold KingZ {grey}| {grey}Server Has Less Players {lime}Adding {0} Bots",
-    "PrintChatToAll.KickBots": "{green}Gold KingZ {grey}| {grey}Server Has More Players {darkred}Kicking All Bots"
+    "PrintChatToAll.KickBots": "{green}Gold KingZ {grey}| {grey}Server Has More Players {darkred}Kicking All Bots",
+    
+    "Wave.TurnedOff": " {green}[Bot Wave]{default} Turned off.",
+    "Wave.PleaseUseNumber": " {green}[Bot Wave]{default} Please use a number.",
+    "Wave.SpecialCodeAccepted": " {green}[Bot Wave]{default} Special code accepted!",
+    "Wave.OnlyFourPlayers": " {green}[Bot Wave]{default} Only 1-4 players can play.",
+    "Wave.StartingWithOverride": " {green}[Bot Wave]{default} Starting at wave {0} with {1} players!",
+    "Wave.StartingAtWave": " {green}[Bot Wave]{default} Starting at wave {0}!",
+    "Wave.TypeToStart": " {green}[Bot Wave]{default} Type !wave to start!",
+    "Wave.TooManyPlayers": " {green}[Bot Wave]{default} Too many players joined! Turning off.",
+    
+"Wave.YouWonNext": " {green}[Bot Wave]{default} You won! Next: Wave {0}",
+    "Wave.YouLostTryAgain": " {green}[Bot Wave]{default} You lost. Try wave {0} again!",
+    "Wave.Milestone20": " {green}[Bot Wave]{default} 🔥 Wave 20! You're doing great!",
+    "Wave.Milestone50": " {green}[Bot Wave]{default} 💪 Wave 50! Amazing!",
+    "Wave.Milestone100": " {green}[Bot Wave]{default} 👑 Wave 100! You are the BEST!",
+    "Wave.MilestoneOther": " {green}[Bot Wave]{default} 🎖️ Wave {0}! Keep going!",
+    
+    "Wave.FightBots": " {green}[Bot Wave]{default} Wave {0} - Fight {1} bots!",
+    "Wave.SpawnLimitReached": " {green}[Bot Wave]{default} Only {0} bots fit on map. {1} will re-spawn!",
+    "Wave.NoMoreRespawns": " {green}[Bot Wave]{default} No more bot re-spawns! Kill the rest!",
+    "Wave.RespawnsLeft": " {green}[Bot Wave]{default} Bot re-spawns left: {0}"
 }
