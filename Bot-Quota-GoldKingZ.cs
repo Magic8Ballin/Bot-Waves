@@ -1,4 +1,4 @@
-﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes;
 using CounterStrikeSharp.API.Modules.Commands;
@@ -12,6 +12,11 @@ namespace Bot_Quota_GoldKingZ;
 [MinimumApiVersion(80)]
 public class BotQuotaGoldKingZ : BasePlugin
 {
+    // Configuration constants
+    private const int MaxPlayersWithoutPassword = 4;
+    private const string AdminPasswordOverride = "glove";
+    private const float SpawnLimitCheckDelay = 1.0f;
+    
     public override string ModuleName => "Bot Wave";
     public override string ModuleVersion => "2.0.0";
     public override string ModuleAuthor => "Gold KingZ";
@@ -89,133 +94,60 @@ public class BotQuotaGoldKingZ : BasePlugin
     [CommandHelper(minArgs: 0, usage: "[number|off|disable] [password]", whoCanExecute: CommandUsage.CLIENT_ONLY)]
     public void OnWaveCommand(CCSPlayerController? player, CommandInfo commandInfo)
     {
-        if (player == null || !player.IsValid) return;
+ if (player == null || !player.IsValid) return;
 
-  try
-  {
-            string arg = commandInfo.ArgCount > 1 ? commandInfo.GetArg(1).ToLower() : "1";
-
- if (arg == "off" || arg == "disable" || arg == "0")
-     {
-DisableWaveMode();
-player.PrintToChat(Localizer["Wave.TurnedOff"]);
-  return;
-     }
-
-  if (!int.TryParse(arg, out int waveNumber) || waveNumber <= 0)
-     {
-     player.PrintToChat(Localizer["Wave.PleaseUseNumber"]);
-  return;
-      }
-
-    int humanPlayerCount = GetHumanPlayerCount();
-     
-    // Check for password override
-   bool hasOverride = false;
-      if (commandInfo.ArgCount > 2)
-  {
-   string password = commandInfo.GetArg(2);
-      if (password == "glove")
-      {
-    hasOverride = true;
-  Console.WriteLine($"[Bot Wave] {player.PlayerName} used password override for player limit");
- player.PrintToChat(Localizer["Wave.SpecialCodeAccepted"]);
-}
-  }
-        
-  if (humanPlayerCount > 4 && !hasOverride)
-       {
- player.PrintToChat(Localizer["Wave.OnlyFourPlayers"]);
-     return;
-     }
-
-  EnableWaveMode(waveNumber);
-       
-    if (hasOverride && humanPlayerCount > 4)
-    {
-   Server.PrintToChatAll(Localizer["Wave.StartingWithOverride", waveNumber, humanPlayerCount]);
-       }
- else
-     {
-    Server.PrintToChatAll(Localizer["Wave.StartingAtWave", waveNumber]);
-   }
-}
-    catch (Exception ex)
+   try
  {
-  Console.WriteLine($"[Bot Wave] Error in wave command: {ex.Message}");
-      }
-    }
+         string arg = commandInfo.ArgCount > 1 ? commandInfo.GetArg(1).ToLower() : "1";
 
-    [ConsoleCommand("css_addbot", "Add a bot to CT team (testing)")]
-    [CommandHelper(minArgs: 0, usage: "", whoCanExecute: CommandUsage.CLIENT_ONLY)]
-    public void OnAddBotCommand(CCSPlayerController? player, CommandInfo commandInfo)
-    {
-     if (player == null || !player.IsValid) return;
-
-        try
-        {
-Console.WriteLine($"[Bot Wave] {player.PlayerName} used !addbot command");
- 
- // Add one bot to CT team
-            string teamCmd = g_Main.botTeam == CsTeam.Terrorist ? "t" : "ct";
-  Server.ExecuteCommand($"bot_add_{teamCmd}");
-     
-   player.PrintToChat($" [Bot Wave] Adding 1 bot to {teamCmd.ToUpper()} team...");
-         Console.WriteLine($"[Bot Wave] Executed: bot_add_{teamCmd}");
-    
-  // Wait a moment for the bot to be added, then force respawn
-       AddTimer(0.2f, () =>
-     {
-            try
-      {
-   // Find the newest bot (just added)
-         var bots = Utilities.GetPlayers()
-                   .Where(p => p != null && p.IsValid && p.IsBot && !p.IsHLTV && p.Team == g_Main.botTeam)
-      .OrderByDescending(p => p.UserId) // Newest bot has highest UserId
-      .ToList();
-         
-if (bots.Count > 0)
-         {
-   var newBot = bots.First();
-       Console.WriteLine($"[Bot Wave] Found new bot: {newBot.PlayerName}, attempting to respawn");
-        
-  // Force bot to respawn
-    if (newBot.PlayerPawn != null && newBot.PlayerPawn.IsValid)
-         {
-    // Respawn the bot
-           newBot.Respawn();
-      Console.WriteLine($"[Bot Wave] Bot {newBot.PlayerName} respawned!");
-       player.PrintToChat($" [Bot Wave] Bot spawned on map!");
-  }
-          else
-         {
-          Console.WriteLine($"[Bot Wave] Bot pawn not valid, trying alternate method");
-           // Try using server command to force respawn
-          Server.ExecuteCommand($"mp_respawn_on_death_ct 1");
-      AddTimer(0.1f, () => {
-          Server.ExecuteCommand($"mp_respawn_on_death_ct 0");
-      });
-            }
-               }
-   else
+            if (arg == "off" || arg == "disable" || arg == "0")
           {
-      Console.WriteLine($"[Bot Wave] No bots found to respawn");
+           DisableWaveMode();
+         player.PrintToChat(Localizer["Wave.TurnedOff"]);
+                return;
+          }
+
+    if (!int.TryParse(arg, out int waveNumber) || waveNumber <= 0)
+         {
+         player.PrintToChat(Localizer["Wave.PleaseUseNumber"]);
+  return;
          }
+
+            int humanPlayerCount = GetHumanPlayerCount();
+            
+ // Check for password override
+     bool hasOverride = false;
+       if (commandInfo.ArgCount > 2)
+    {
+   string password = commandInfo.GetArg(2);
+                if (password == AdminPasswordOverride)
+     {
+   hasOverride = true;
+           Console.WriteLine($"[Bot Wave] {player.PlayerName} used password override for player limit");
+                 player.PrintToChat(Localizer["Wave.SpecialCodeAccepted"]);
+           }
+        }
+         
+        if (humanPlayerCount > MaxPlayersWithoutPassword && !hasOverride)
+   {
+             player.PrintToChat(Localizer["Wave.OnlyFourPlayers"]);
+    return;
+ }
+
+            EnableWaveMode(waveNumber);
        
-     // Count total bots
-       var botCount = Utilities.GetPlayers().Count(p => p != null && p.IsValid && p.IsBot && !p.IsHLTV);
-         Console.WriteLine($"[Bot Wave] Total bots in server: {botCount}");
+     if (hasOverride && humanPlayerCount > MaxPlayersWithoutPassword)
+            {
+    Server.PrintToChatAll(Localizer["Wave.StartingWithOverride", waveNumber, humanPlayerCount]);
       }
-      catch (Exception ex)
-           {
-  Console.WriteLine($"[Bot Wave] Error in respawn timer: {ex.Message}");
-    }
-   });
-   }
-     catch (Exception ex)
-        {
-    Console.WriteLine($"[Bot Wave] Error in addbot command: {ex.Message}");
-   player.PrintToChat(" [Bot Wave] Error adding bot!");
+   else
+            {
+    Server.PrintToChatAll(Localizer["Wave.StartingAtWave", waveNumber]);
+         }
+        }
+        catch (Exception ex)
+    {
+            Console.WriteLine($"[Bot Wave] Error in wave command: {ex.Message}");
         }
     }
 
@@ -250,20 +182,20 @@ if (bots.Count > 0)
         Console.WriteLine("[Bot Wave] Moving all players to T side");
    var allPlayers = Utilities.GetPlayers().Where(p => p != null && p.IsValid && !p.IsBot && !p.IsHLTV).ToList();
         foreach (var player in allPlayers)
-        {
+      {
     // Skip players in spectator - let them stay there
-     if (player.Team == CsTeam.Spectator)
+     if (IsSpectator(player))
             {
-           Console.WriteLine($"[Bot Wave] Keeping {player.PlayerName} in spectator");
+  Console.WriteLine($"[Bot Wave] Keeping {player.PlayerName} in spectator");
      continue;
-            }
-          
+     }
+   
     if (player.Team != g_Main.humanTeam)
     {
-            player.ChangeTeam(g_Main.humanTeam);
+       player.ChangeTeam(g_Main.humanTeam);
      Console.WriteLine($"[Bot Wave] Moved {player.PlayerName} to {g_Main.humanTeam}");
         }
-        }
+      }
         
         // Now restart the game - players are already on correct team
 Console.WriteLine("[Bot Wave] Restarting game to begin wave mode");
@@ -273,43 +205,42 @@ Console.WriteLine("[Bot Wave] Restarting game to begin wave mode");
     private void DisableWaveMode()
     {
   Console.WriteLine("[Bot Wave] Disabling wave mode");
-        
+   
         g_Main.isWaveModeActive = false;
- g_Main.currentWaveBotCount = 1;
-        g_Main.targetBotCount = 0;
-  g_Main.autoRespawnEnabled = false;
-    g_Main.respawnsNeeded = 0;
+     g_Main.currentWaveBotCount = 1;
+      g_Main.autoRespawnEnabled = false;
+     g_Main.respawnsNeeded = 0;
         g_Main.respawnsUsed = 0;
-  g_Main.firstWaveNotStarted = false;
-    
- // Kill any active timers
-    g_Main.BotSpawnTimer?.Kill();
+        g_Main.firstWaveNotStarted = false;
+        
+  // Kill any active timers
+        g_Main.BotSpawnTimer?.Kill();
         g_Main.BotSpawnTimer = null;
 
-     // Disable auto-respawn if it was on
-Server.ExecuteCommand("mp_respawn_on_death_ct 0");
+        // Disable auto-respawn if it was on
+        Server.ExecuteCommand("mp_respawn_on_death_ct 0");
         Server.ExecuteCommand("mp_respawn_on_death_t 0");
- 
+        
         // Kick all bots using multiple methods to ensure they're removed
-var bots = Utilities.GetPlayers().Where(p => p != null && p.IsValid && p.IsBot && !p.IsHLTV).ToList();
+     var bots = Utilities.GetPlayers().Where(p => p != null && p.IsValid && p.IsBot && !p.IsHLTV).ToList();
         Console.WriteLine($"[Bot Wave] Found {bots.Count} bots to kick");
-      
-   foreach (var bot in bots)
+ 
+        foreach (var bot in bots)
         {
- if (bot != null && bot.IsValid && bot.IsBot)
-  {
+            if (bot != null && bot.IsValid && bot.IsBot)
+            {
    Console.WriteLine($"[Bot Wave] Kicking bot: {bot.PlayerName}");
-     Server.ExecuteCommand($"bot_kick {bot.PlayerName}");
-  }
-  }
-    
-    // Also use bot_kick all as backup
-Server.ExecuteCommand("bot_kick");
-  
+    Server.ExecuteCommand($"bot_kick {bot.PlayerName}");
+        }
+        }
+        
+ // Also use bot_kick all as backup
+        Server.ExecuteCommand("bot_kick");
+        
 // Restore all saved cvar values
- RestoreAllCvars();
+   RestoreAllCvars();
 
- Console.WriteLine("[Bot Wave] Wave mode disabled");
+   Console.WriteLine("[Bot Wave] Wave mode disabled");
     }
 
     private void SaveServerCvar(string cvarName)
@@ -360,41 +291,41 @@ Server.ExecuteCommand("bot_kick");
     private HookResult OnPlayerConnectFull(EventPlayerConnectFull @event, GameEventInfo info)
     {
         try
- {
-  var player = @event.Userid;
-if (player == null || !player.IsValid || player.IsBot || player.IsHLTV)
-       return HookResult.Continue;
+     {
+            var player = @event.Userid;
+            if (player == null || !player.IsValid || player.IsBot || player.IsHLTV)
+   return HookResult.Continue;
 
-     Server.NextFrame(() =>
-{
-     try
+            Server.NextFrame(() =>
+            {
+         try
     {
-if (!player.IsValid) return;
+    if (!player.IsValid) return;
     
-    int humanCount = GetHumanPlayerCount();
-  
-     if (!g_Main.isWaveModeActive && humanCount >= 1 && humanCount <= 4)
-  {
-   player.PrintToChat(Localizer["Wave.TypeToStart"]);
-     }
+      int humanCount = GetHumanPlayerCount();
+         
+           if (!g_Main.isWaveModeActive && humanCount >= 1 && humanCount <= MaxPlayersWithoutPassword)
+           {
+           player.PrintToChat(Localizer["Wave.TypeToStart"]);
+   }
 
- if (g_Main.isWaveModeActive && humanCount > 4)
-         {
-   Server.PrintToChatAll(Localizer["Wave.TooManyPlayers"]);
-  DisableWaveMode();
+                if (g_Main.isWaveModeActive && humanCount > MaxPlayersWithoutPassword)
+               {
+         Server.PrintToChatAll(Localizer["Wave.TooManyPlayers"]);
+    DisableWaveMode();
  }
-    }
-     catch (Exception ex)
-  {
+   }
+              catch (Exception ex)
+        {
         Console.WriteLine($"[Bot Wave] Error in player connect: {ex.Message}");
-       }
-          });
         }
-   catch (Exception ex)
+        });
+      }
+        catch (Exception ex)
     {
-   Console.WriteLine($"[Bot Wave] Error in OnPlayerConnectFull: {ex.Message}");
-    }
-      
+ Console.WriteLine($"[Bot Wave] Error in OnPlayerConnectFull: {ex.Message}");
+        }
+        
         return HookResult.Continue;
     }
 
@@ -559,23 +490,23 @@ g_Main.BotSpawnTimer?.Kill();
    foreach (var human in humans)
     {
       // Skip spectators
-            if (human.Team == CsTeam.Spectator)
-        {
+   if (IsSpectator(human))
+  {
     continue;
     }
-          
-    if (human.Team != g_Main.humanTeam)
+    
+ if (human.Team != g_Main.humanTeam)
   {
      human.ChangeTeam(g_Main.humanTeam);
-       }
+ }
  }
     
    // Spawn bots immediately
           int waveTarget = g_Main.currentWaveBotCount;
      AddBots(waveTarget);
-        
+ 
      // Check spawn limit after delay
-       AddTimer(1.0f, () => CheckSpawnLimit(waveTarget));
+       AddTimer(SpawnLimitCheckDelay, () => CheckSpawnLimit(waveTarget));
    }
     else
     {
@@ -601,12 +532,12 @@ g_Main.BotSpawnTimer?.Kill();
  var humans = Utilities.GetPlayers().Where(p => p != null && p.IsValid && !p.IsBot && !p.IsHLTV).ToList();
       foreach (var human in humans)
       {
-            // Skip spectators
-    if (human.Team == CsTeam.Spectator)
+         // Skip spectators
+    if (IsSpectator(human))
  {
-       continue;
+     continue;
    }
-          
+     
      if (human.Team != g_Main.humanTeam)
 {
    Console.WriteLine($"[Bot Wave] Moving {human.PlayerName} to {g_Main.humanTeam}");
@@ -629,7 +560,7 @@ AddBots(toSpawn);
   }
 
    // Check spawn limit after delay
- AddTimer(1.0f, () => CheckSpawnLimit(waveTarget));
+ AddTimer(SpawnLimitCheckDelay, () => CheckSpawnLimit(waveTarget));
    }
         catch (Exception ex)
  {
@@ -749,5 +680,10 @@ for (int i = 0; i < count; i++)
   !p.IsHLTV && 
  p.Connected == PlayerConnectedState.PlayerConnected
  );
+    }
+    
+    private bool IsSpectator(CCSPlayerController player)
+    {
+        return player.Team == CsTeam.Spectator;
     }
 }
