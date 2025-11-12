@@ -7,3 +7,12 @@ C:\Users\Magic8Ball\source\repos\Bot-Waves\obj\Debug\BotWaves.csproj.CoreCompile
 C:\Users\Magic8Ball\source\repos\Bot-Waves\obj\Debug\BotWaves.dll
 C:\Users\Magic8Ball\source\repos\Bot-Waves\obj\Debug\refint\BotWaves.dll
 C:\Users\Magic8Ball\source\repos\Bot-Waves\obj\Debug\ref\BotWaves.dll
+C:\Users\Magic8Ball\source\repos\BotWaves\bin\Release\addons\counterstrikesharp\plugins\BotWaves\lang\en.json
+C:\Users\Magic8Ball\source\repos\BotWaves\bin\Release\addons\counterstrikesharp\plugins\BotWaves\BotWaves.deps.json
+C:\Users\Magic8Ball\source\repos\BotWaves\bin\Release\addons\counterstrikesharp\plugins\BotWaves\BotWaves.dll
+C:\Users\Magic8Ball\source\repos\BotWaves\obj\Debug\BotWaves.csproj.AssemblyReference.cache
+C:\Users\Magic8Ball\source\repos\BotWaves\obj\Debug\BotWaves.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Magic8Ball\source\repos\BotWaves\obj\Debug\BotWaves.csproj.CoreCompileInputs.cache
+C:\Users\Magic8Ball\source\repos\BotWaves\obj\Debug\BotWaves.dll
+C:\Users\Magic8Ball\source\repos\BotWaves\obj\Debug\refint\BotWaves.dll
+C:\Users\Magic8Ball\source\repos\BotWaves\obj\Debug\ref\BotWaves.dll

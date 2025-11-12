@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Magic8Ball\\source\\repos\\Bot-Waves\\BotWaves.csproj": {}
+    "C:\\Users\\Magic8Ball\\source\\repos\\BotWaves\\BotWaves.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Magic8Ball\\source\\repos\\Bot-Waves\\BotWaves.csproj": {
+    "C:\\Users\\Magic8Ball\\source\\repos\\BotWaves\\BotWaves.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Magic8Ball\\source\\repos\\Bot-Waves\\BotWaves.csproj",
+        "projectUniqueName": "C:\\Users\\Magic8Ball\\source\\repos\\BotWaves\\BotWaves.csproj",
         "projectName": "BotWaves",
-        "projectPath": "C:\\Users\\Magic8Ball\\source\\repos\\Bot-Waves\\BotWaves.csproj",
+        "projectPath": "C:\\Users\\Magic8Ball\\source\\repos\\BotWaves\\BotWaves.csproj",
         "packagesPath": "C:\\Users\\Magic8Ball\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Magic8Ball\\source\\repos\\Bot-Waves\\obj\\",
+        "outputPath": "C:\\Users\\Magic8Ball\\source\\repos\\BotWaves\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

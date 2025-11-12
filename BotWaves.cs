@@ -13,7 +13,7 @@ public class BotWaves : BasePlugin, IPluginConfig<ConfigGen>
 {
     public override string ModuleName => "Bot Waves";
     public override string ModuleVersion => "2.0.1";
-    public override string ModuleAuthor => "Gold KingZ";
+    public override string ModuleAuthor => "Gold KingZ & Magic8Ball";
     public override string ModuleDescription => "Bot Wave survival mode for 1-4 players";
     
     public static BotWaves? Instance { get; private set; }
