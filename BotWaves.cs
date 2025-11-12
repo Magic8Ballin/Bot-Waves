@@ -403,19 +403,20 @@ if (Config.LogBotSpawns)
     Server.NextFrame(() =>
             {
             try
-            {
+         {
       if (!player.IsValid) return;
        
  int humanCount = GetHumanPlayerCount();
-        
+    
   // Check if wave mode should be disabled due to too many players
            if (g_Main.isWaveModeActive && 
  humanCount > Config.MaxPlayersWithoutPassword && 
       !g_Main.waveStartedWithOverride &&
         Config.DisableWaveOnFifthPlayer)
-               {
-      Console.WriteLine($"[Bot Waves] {player.PlayerName} is the {humanCount}th player. No override was used, disabling wave mode.");
+       {
+    Console.WriteLine($"[Bot Waves] {player.PlayerName} is the {humanCount}th player. No override was used, disabling wave mode.");
         Server.PrintToChatAll(Localizer["Wave.FifthPlayerJoined"]);
+        Server.PrintToChatAll(Localizer["Wave.FifthPlayerJoinedThanks"]);
  DisableWaveMode();
          }
  else if (g_Main.isWaveModeActive && 
@@ -433,12 +434,11 @@ if (Config.LogBotSpawns)
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[Bot Waves] Error in OnPlayerConnectFull: {ex.Message}");
-        }
+     Console.WriteLine($"[Bot Waves] Error in OnPlayerConnectFull: {ex.Message}");
+ }
       
       return HookResult.Continue;
  }
-
     private HookResult OnPlayerTeam(EventPlayerTeam @event, GameEventInfo info)
     {
         try
