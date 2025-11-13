@@ -44,6 +44,11 @@ public class Globals
     // Credit and perk system
     public Dictionary<ulong, int> playerCredits = new Dictionary<ulong, int>();
     public Dictionary<ulong, PlayerPerks> playerPerks = new Dictionary<ulong, PlayerPerks>();
+    
+    // Kill tracking for round statistics (SteamID -> kill count)
+    public Dictionary<ulong, int> roundKills = new Dictionary<ulong, int>();
+    // Track which players participated in the current round
+    public HashSet<ulong> roundParticipants = new HashSet<ulong>();
 }
 
 public class PlayerPerks

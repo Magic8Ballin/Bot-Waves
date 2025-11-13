@@ -18,5 +18,8 @@
     "Wave.FightBots": " {green}[!wave]{default} Wave {0} - Fight {1} bots!",
     "Wave.SpawnLimitReached": " {green}[!wave]{default} Only {0} bots fit on map. {1} will re-spawn!",
     "Wave.NoMoreRespawns": " {green}[!wave]{default} No more bot re-spawns! Kill the rest!",
-    "Wave.RespawnsLeft": " {green}[!wave ]{default} Bot re-spawns left: {0}"
+    "Wave.RespawnsLeft": " {green}[!wave ]{default} Bot re-spawns left: {0}",
+
+    "Wave.Stats.Kills": " {lime}{0}{default} - {1} kill",
+    "Wave.Stats.KillsPlural": " {lime}{0}{default} - {1} kills"
 }
