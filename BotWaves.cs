@@ -167,14 +167,21 @@ public class BotWaves : BasePlugin, IPluginConfig<ConfigGen>
         g_Main.waveStartedWithOverride = usedOverride;
     g_Main.playersAssignedToTeam.Clear();
 
+        // Reset respawn system to prevent leftover state
+        g_Main.autoRespawnEnabled = false;
+        g_Main.respawnsNeeded = 0;
+        g_Main.respawnsUsed = 0;
+    Server.ExecuteCommand("mp_respawn_on_death_ct 0");
+        Console.WriteLine("[Bot Waves] RESET: Cleared respawn system state when enabling wave mode");
+
      // Save current server cvar values
         SaveServerCvar("mp_autoteambalance");
-        SaveServerCvar("mp_limitteams");
+   SaveServerCvar("mp_limitteams");
         SaveServerCvar("mp_teambalance_enabled");
      SaveServerCvar("mp_force_pick_time");
   SaveServerCvar("mp_roundtime");
-        SaveServerCvar("mp_warmuptime");
-        SaveServerCvar("mp_do_warmup_period");
+      SaveServerCvar("mp_warmuptime");
+    SaveServerCvar("mp_do_warmup_period");
       SaveServerCvar("mp_forcecamera");
 
    Console.WriteLine($"[Bot Waves] Saved {g_Main.savedCvars.Count} cvar values");
@@ -190,21 +197,21 @@ public class BotWaves : BasePlugin, IPluginConfig<ConfigGen>
         Server.ExecuteCommand("mp_do_warmup_period 0");
     Console.WriteLine("[Bot Waves] Disabled warmup to prevent player join restarts");
 
-        // Force spectators to only watch their own team (Terrorists)
+ // Force spectators to only watch their own team (Terrorists)
         Server.ExecuteCommand("mp_forcecamera 1");
         Console.WriteLine("[Bot Waves] Set mp_forcecamera 1 - dead Terrorists can only spectate teammates");
 
         // Kick all existing bots
-        Console.WriteLine("[Bot Waves] Kicking all existing bots");
+Console.WriteLine("[Bot Waves] Kicking all existing bots");
         Server.ExecuteCommand("bot_kick");
 
         // Mark all players for team assignment on next spawn
       Console.WriteLine("[Bot Waves] Marking all players for team assignment on next spawn");
-        var allPlayers = Utilities.GetPlayers().Where(p => p != null && p.IsValid && !p.IsBot && !p.IsHLTV).ToList();
+   var allPlayers = Utilities.GetPlayers().Where(p => p != null && p.IsValid && !p.IsBot && !p.IsHLTV).ToList();
    foreach (var playerToAssign in allPlayers)
   {
             if (IsSpectator(playerToAssign))
-            {
+  {
        Console.WriteLine($"[Bot Waves] {playerToAssign.PlayerName} is spectator, will stay in spec");
                 continue;
        }
@@ -216,7 +223,7 @@ public class BotWaves : BasePlugin, IPluginConfig<ConfigGen>
 Console.WriteLine("[Bot Waves] Restarting game to begin wave mode");
         Server.ExecuteCommand("mp_restartgame 1");
 
-        Server.PrintToChatAll(Localizer["Wave.StartingAtWave", startWave]);
+      Server.PrintToChatAll(Localizer["Wave.StartingAtWave", startWave]);
   }
 
     private void DisableWaveMode()
@@ -687,33 +694,38 @@ Console.WriteLine("========================================");
     private HookResult OnRoundStart(EventRoundStart @event, GameEventInfo info)
     {
         try
-        {
-            if (Config.LogRoundEvents)
+    {
+    if (Config.LogRoundEvents)
       {
-      Console.WriteLine($"[Bot Waves] OnRoundStart fired. Wave mode active: {g_Main.isWaveModeActive}, Just activated: {g_Main.waveModeJustActivated}");
+    Console.WriteLine($"[Bot Waves] OnRoundStart fired. Wave mode active: {g_Main.isWaveModeActive}, Just activated: {g_Main.waveModeJustActivated}");
   }
 
             // Show help messages if wave mode is NOT active and we have 1-4 players
-            if (!g_Main.isWaveModeActive && Config.ShowHelpMessages)
+     if (!g_Main.isWaveModeActive && Config.ShowHelpMessages)
             {
         int humanCount = GetHumanPlayerCount();
 
     if (humanCount >= 1 && humanCount <= Config.MaxPlayersWithoutPassword)
      {
       Server.PrintToChatAll(Localizer["Wave.HelpStart"]);
-            Server.PrintToChatAll(Localizer["Wave.HelpCustomWave"]);
-         Server.PrintToChatAll(Localizer["Wave.HelpTurnOff"]);
+       Server.PrintToChatAll(Localizer["Wave.HelpCustomWave"]);
+   Server.PrintToChatAll(Localizer["Wave.HelpTurnOff"]);
 
      Console.WriteLine($"[Bot Waves] Showed help messages to {humanCount} players");
-          }
+        }
   }
 
-            if (!g_Main.isWaveModeActive) return HookResult.Continue;
+         if (!g_Main.isWaveModeActive) return HookResult.Continue;
 
  // Mark that we're now in an active round
     g_Main.isRoundActive = true;
 
-      // Reset auto-respawn system
+      // CRITICAL: Always disable respawn at the start of every wave to prevent leftover state
+      // This ensures clean slate even when manually changing wave numbers
+    Server.ExecuteCommand("mp_respawn_on_death_ct 0");
+      Console.WriteLine("[Bot Waves] RESET: Disabled mp_respawn_on_death_ct at round start (will re-enable if needed)");
+
+      // Reset auto-respawn tracking variables
           g_Main.autoRespawnEnabled = false;
             g_Main.respawnsNeeded = 0;
       g_Main.respawnsUsed = 0;
@@ -722,9 +734,9 @@ Console.WriteLine("========================================");
         g_Main.BotSpawnTimer?.Kill();
           g_Main.BotSpawnTimer = null;
 
-            Server.NextFrame(() => DoRoundStart());
+      Server.NextFrame(() => DoRoundStart());
 }
-        catch (Exception ex)
+    catch (Exception ex)
      {
 Console.WriteLine($"[Bot Waves] Error in OnRoundStart: {ex.Message}");
         }
