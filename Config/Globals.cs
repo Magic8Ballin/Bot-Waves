@@ -7,6 +7,7 @@ public class Globals
 {
     // Timers
     public CounterStrikeSharp.API.Modules.Timers.Timer? BotSpawnTimer;
+    public CounterStrikeSharp.API.Modules.Timers.Timer? HelpMessageTimer;
     
     // Wave mode state
     public bool isWaveModeActive = false;

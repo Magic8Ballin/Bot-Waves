@@ -43,6 +43,12 @@ public class BotWaves : BasePlugin, IPluginConfig<ConfigGen>
             RegisterEventHandler<EventPlayerTeam>(OnPlayerTeam);
             RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn);
             RegisterEventHandler<EventPlayerDeath>(OnPlayerDeath);
+            
+            // Start help message timer (every 60 seconds)
+            if (Config.ShowHelpMessages)
+            {
+                g_Main.HelpMessageTimer = AddTimer(60.0f, ShowHelpMessagesIfNeeded, TimerFlags.REPEAT);
+            }
         }
         catch (Exception ex)
         {
@@ -53,6 +59,10 @@ public class BotWaves : BasePlugin, IPluginConfig<ConfigGen>
 
     public override void Unload(bool hotReload)
     {
+        // Kill help message timer
+        g_Main.HelpMessageTimer?.Kill();
+        g_Main.HelpMessageTimer = null;
+  
         if (g_Main.isWaveModeActive)
         {
             DisableWaveMode();
@@ -164,6 +174,13 @@ public class BotWaves : BasePlugin, IPluginConfig<ConfigGen>
         SaveServerCvar("mp_do_warmup_period");
         SaveServerCvar("mp_forcecamera");
 
+        // Save and disable Skill Auto Balance plugin (if enabled in config)
+        if (Config.DisableSkillAutoBalanceInWaveMode)
+        {
+            SaveServerCvar("css_skill_autobalance_minplayers");
+            Server.ExecuteCommand("css_skill_autobalance_minplayers 30");
+        }
+
         // Disable all auto-balancing mechanisms
         Server.ExecuteCommand("mp_autoteambalance 0");
         Server.ExecuteCommand("mp_limitteams 0");
@@ -232,6 +249,7 @@ public class BotWaves : BasePlugin, IPluginConfig<ConfigGen>
                 "mp_warmuptime" => "60",
                 "mp_do_warmup_period" => "1",
                 "mp_forcecamera" => "0",
+                "css_skill_autobalance_minplayers" => "5",
                 _ => "1"
             };
 
@@ -572,42 +590,29 @@ public class BotWaves : BasePlugin, IPluginConfig<ConfigGen>
     {
         try
         {
-            // Show help messages if wave mode is NOT active and we have 1-4 players
-            if (!g_Main.isWaveModeActive && Config.ShowHelpMessages)
-            {
-                int humanCount = GetHumanPlayerCount();
-
-                if (humanCount >= 1 && humanCount <= Config.MaxPlayersWithoutPassword)
-                {
-                    Server.PrintToChatAll(Localizer["Wave.HelpStart"]);
-                    Server.PrintToChatAll(Localizer["Wave.HelpCustomWave"]);
-                    Server.PrintToChatAll(Localizer["Wave.HelpTurnOff"]);
-                }
-            }
-
             if (!g_Main.isWaveModeActive) return HookResult.Continue;
 
-            // Mark that we're now in an active round
+       // Mark that we're now in an active round
             g_Main.isRoundActive = true;
 
-            // CRITICAL: Always disable respawn at the start of every wave to prevent leftover state
-            Server.ExecuteCommand("mp_respawn_on_death_ct 0");
+     // CRITICAL: Always disable respawn at the start of every wave to prevent leftover state
+  Server.ExecuteCommand("mp_respawn_on_death_ct 0");
 
-            // Reset auto-respawn tracking variables
-            g_Main.autoRespawnEnabled = false;
+      // Reset auto-respawn tracking variables
+          g_Main.autoRespawnEnabled = false;
             g_Main.respawnsNeeded = 0;
-            g_Main.respawnsUsed = 0;
+       g_Main.respawnsUsed = 0;
 
-            // Kill any existing spawn timer
+  // Kill any existing spawn timer
             g_Main.BotSpawnTimer?.Kill();
-            g_Main.BotSpawnTimer = null;
+         g_Main.BotSpawnTimer = null;
 
             Server.NextFrame(() => DoRoundStart());
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[Bot Waves] Error in OnRoundStart: {ex.Message}");
-        }
+   Console.WriteLine($"[Bot Waves] Error in OnRoundStart: {ex.Message}");
+      }
 
         return HookResult.Continue;
     }
@@ -839,5 +844,28 @@ public class BotWaves : BasePlugin, IPluginConfig<ConfigGen>
         string roundTimeStr = roundTimeMinutes.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
 
         Server.ExecuteCommand($"mp_roundtime {roundTimeStr}");
+    }
+
+    private void ShowHelpMessagesIfNeeded()
+    {
+   try
+        {
+      // Only show messages if wave mode is NOT active and we have 1-4 players
+            if (g_Main.isWaveModeActive || !Config.ShowHelpMessages)
+   return;
+
+            int humanCount = GetHumanPlayerCount();
+
+   if (humanCount >= 1 && humanCount <= Config.MaxPlayersWithoutPassword)
+            {
+        Server.PrintToChatAll(Localizer["Wave.HelpStart"]);
+          Server.PrintToChatAll(Localizer["Wave.HelpCustomWave"]);
+            Server.PrintToChatAll(Localizer["Wave.HelpTurnOff"]);
+  }
+        }
+    catch (Exception ex)
+   {
+         Console.WriteLine($"[Bot Waves] Error in ShowHelpMessagesIfNeeded: {ex.Message}");
+        }
     }
 }

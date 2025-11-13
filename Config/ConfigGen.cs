@@ -15,6 +15,9 @@ public class ConfigGen : BasePluginConfig
     
     [JsonPropertyName("DisableWaveOnFifthPlayer")]
     public bool DisableWaveOnFifthPlayer { get; set; } = true;
+    
+    [JsonPropertyName("DisableSkillAutoBalanceInWaveMode")]
+    public bool DisableSkillAutoBalanceInWaveMode { get; set; } = true;
   
     // ===== Round Time Settings =====
     [JsonPropertyName("EnableDynamicRoundTime")]
